@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "930661782392",
+    "project_id": "attedance-8ea2f",
+    "storage_bucket": "attedance-8ea2f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:930661782392:android:87c8ea624d9636bdddee8d",
+        "android_client_info": {
+          "package_name": "com.example.emergency_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "930661782392-8rft7t9alrh1pfrv5ldcrvb4o6jdhqq8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCakcEgf3foznYX3jWlejEznulAIlTwe8w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "930661782392-8rft7t9alrh1pfrv5ldcrvb4o6jdhqq8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
