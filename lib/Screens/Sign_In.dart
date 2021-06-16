@@ -18,7 +18,7 @@ class _SignInState extends State<SignIn> {
     try {
       UserCredential user = await signInWithEmail(_email.text, _password.text);
       if (user != null) {
-        Navigator.pushReplacement(
+        Navigator.push(
             context, MaterialPageRoute(builder: (context) => HomeScreen()));
       }
     } catch (e) {

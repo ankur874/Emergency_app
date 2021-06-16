@@ -1,6 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:emergency_app/Resources/Auth.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class RoomScreen extends StatefulWidget {
+  final roomdetails;
+  final isAdmin;
+  RoomScreen({this.roomdetails,this.isAdmin});
   @override
   _RoomScreenState createState() => _RoomScreenState();
 }
@@ -60,6 +66,12 @@ class _RoomScreenState extends State<RoomScreen> {
                     color: Colors.white),
               )),
             ),
+            SizedBox(height: 50),
+            widget.isAdmin == true
+                ? ElevatedButton(onPressed: () {
+                  //FirebaseFirestore.instance.collection("rooms").doc()
+                }, child: Text("Delete Room"))
+                : ElevatedButton(onPressed: () {}, child: Text("Leave Room")),
           ],
         ),
       ),

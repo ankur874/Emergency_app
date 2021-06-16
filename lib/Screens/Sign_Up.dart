@@ -1,3 +1,4 @@
+import 'package:emergency_app/Model/userModel.dart';
 import 'package:emergency_app/Resources/Auth.dart';
 import 'package:emergency_app/Screens/Home_Screen.dart';
 import 'package:emergency_app/Screens/Sign_In.dart';
@@ -24,8 +25,10 @@ class _SignUpState extends State<SignUp> {
         UserCredential signedUpUser = await signupWithEmail(
             _emailController.text, _passwordController.text);
         if (signedUpUser != null) {
-          Navigator.pushReplacement(
-              context, MaterialPageRoute(builder: (context) => HomeScreen()));
+          uploadToDb(signedUpUser.user!).then((value) {
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => HomeScreen()));
+          });
         }
       } catch (e) {
         print(e);

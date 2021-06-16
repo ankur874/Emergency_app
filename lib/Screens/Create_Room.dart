@@ -1,5 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:emergency_app/Model/roomModel.dart';
+import 'package:emergency_app/Resources/Auth.dart';
 import 'package:emergency_app/Screens/Room_Screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:nanoid/nanoid.dart';
 
 class CreateRoom extends StatefulWidget {
   @override
@@ -7,6 +12,16 @@ class CreateRoom extends StatefulWidget {
 }
 
 class _CreateRoomState extends State<CreateRoom> {
+  TextEditingController roomNameController = new TextEditingController();
+  String currentUserId = FirebaseAuth.instance.currentUser!.uid;
+  changeUserDetails(roomModel newRoom) async {
+    User currentUser = await getCurrentUser();
+    FirebaseFirestore.instance
+        .collection("users")
+        .doc(currentUserId)
+        .update({"isAdmin": true, "joinedRoom": newRoom.rid});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,6 +35,7 @@ class _CreateRoomState extends State<CreateRoom> {
               Container(
                 width: MediaQuery.of(context).size.width / 2,
                 child: TextFormField(
+                  controller: roomNameController,
                   decoration: InputDecoration(
                     contentPadding: EdgeInsets.all(8.0),
                     hintText: "Enter Room Name",
@@ -35,10 +51,23 @@ class _CreateRoomState extends State<CreateRoom> {
                   height: 40.0,
                   child: ElevatedButton(
                       onPressed: () {
+                        var id = customAlphabet(
+                            roomNameController.text + "123456789@!#", 10);
+
+                        roomModel newRoom = new roomModel(
+                            rid: id.toString(),
+                            adminId: currentUserId,
+                            mates: [],
+                            roomName: roomNameController.text);
+                        uploadRoomToDb(newRoom);
+                        changeUserDetails(newRoom);
                         Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => RoomScreen()));
+                                builder: (context) => RoomScreen(
+                                      roomdetails: newRoom,
+                                      isAdmin: false,
+                                    )));
                       },
                       child: Text("Create Room"))),
             ],

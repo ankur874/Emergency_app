@@ -1,3 +1,4 @@
+import 'package:emergency_app/Resources/Auth.dart';
 import 'package:emergency_app/Screens/Create_Room.dart';
 import 'package:emergency_app/Screens/Joining_Screen.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +13,14 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        actions: [
+          IconButton(
+              onPressed: () {
+                signOut();
+                Navigator.pop(context);
+              },
+              icon: Icon(Icons.logout))
+        ],
         centerTitle: true,
         title: Text("Attendance"),
       ),
@@ -45,10 +54,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 height: 50,
                 child: ElevatedButton(
                   onPressed: () {
-                     Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => CreateRoom()));
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => CreateRoom()));
                   },
                   child: Text(
                     "Create a class",
