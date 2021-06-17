@@ -18,7 +18,7 @@ class roomModel {
     return myMap;
   }
 
-  roomModel.toMap(Map<String, dynamic> myMap) {
+  roomModel.fromMap(Map<String, dynamic> myMap) {
     this.adminId = myMap["adminId"];
     this.mates = myMap["mates"];
     this.rid = myMap["rid"];

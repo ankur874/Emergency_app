@@ -52,7 +52,7 @@ class _CreateRoomState extends State<CreateRoom> {
                   child: ElevatedButton(
                       onPressed: () {
                         var id = customAlphabet(
-                            roomNameController.text + "123456789@!#", 10);
+                            roomNameController.text + "123456789", 10);
 
                         roomModel newRoom = new roomModel(
                             rid: id.toString(),
@@ -66,7 +66,7 @@ class _CreateRoomState extends State<CreateRoom> {
                             MaterialPageRoute(
                                 builder: (context) => RoomScreen(
                                       roomdetails: newRoom,
-                                      isAdmin: false,
+                                      isAdmin: true,
                                     )));
                       },
                       child: Text("Create Room"))),
