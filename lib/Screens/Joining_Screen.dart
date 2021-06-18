@@ -22,24 +22,29 @@ class _JoiningScreenState extends State<JoiningScreen> {
         .collection("rooms")
         .doc(roomIdController.text.toString())
         .get();
+
     roomModel room = roomModel.fromMap(vari.data()!);
-    print(room.adminId);
+    List<dynamic> newMates = vari["mates"];
 
     print("-----------------------------6464----------");
-    // User currentUser = await getCurrentUser();
-    //     FirebaseFirestore.instance
-    //         .collection("users")
-    //         .doc(currentUser.uid)
-    //         .update({"joinedRoom": room.rid});
-    //     Navigator.pushReplacement(
-    //         context,
-    //         MaterialPageRoute(
-    //             builder: (context) => RoomScreen(
-    //                   isAdmin: false,
-    //                   roomdetails: room,
-    //                 )));
-    //   });
-    // });
+    User currentUser = await getCurrentUser();
+    newMates.add(currentUser.uid);
+    FirebaseFirestore.instance
+        .collection("rooms")
+        .doc(roomIdController.text)
+        .update({"mates": newMates});
+    FirebaseFirestore.instance
+        .collection("users")
+        .doc(currentUser.uid)
+        .update({"joinedRoom": room.rid}).then((value) {
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) => RoomScreen(
+                    isAdmin: false,
+                    roomdetails: room,
+                  )));
+    });
   }
 
   @override
