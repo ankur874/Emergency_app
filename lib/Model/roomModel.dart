@@ -4,7 +4,7 @@ class roomModel {
   String rid = "";
   String adminId = "";
   String roomName = "";
-  List<userClass> mates = [];
+  List<String> mates = [];
 
   roomModel({required this.rid,required this.adminId, required this.mates,required this.roomName});
 
@@ -20,7 +20,7 @@ class roomModel {
 
   roomModel.fromMap(Map<String, dynamic> myMap) {
     this.adminId = myMap["adminId"];
-    this.mates = myMap["mates"];
+    //this.mates = myMap["mates"];
     this.rid = myMap["rid"];
     this.roomName=myMap["roomName"];
   }

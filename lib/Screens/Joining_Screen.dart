@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:emergency_app/Model/roomModel.dart';
+import 'package:emergency_app/Model/userModel.dart';
 import 'package:emergency_app/Resources/Auth.dart';
 import 'package:emergency_app/Screens/Room_Screen.dart';
 import 'package:emergency_app/Utils/Constants.dart';
@@ -15,41 +16,30 @@ class _JoiningScreenState extends State<JoiningScreen> {
   TextEditingController roomIdController = new TextEditingController();
 
   Future<void> joinRoom() async {
-//     // Stream<DocumentSnapshot<Map<String, dynamic>>> stream = FirebaseFirestore
-//     //     .instance
-//     //     .collection("rooms")
-//     //     .doc(roomIdController.text.toString())
-//     //     .snapshots();
-//     // stream.listen((event) {
-//     //   event.data()!.forEach((key, value) async {
-//     //     roomModel room = roomModel.fromMap({"key": value});
-//     FirebaseFirestore.instance.collection('rooms')
-//   .where('rid', isEqualTo: roomIdController.text.toString())
-//   .snapshots()
-//   .listen((QuerySnapshot querySnapshot){
-//     querySnapshot.docs.forEach((document) {
-//           roomModel room=roomModel.fromMap(document);
-//     });
-//   }
-// );
+    print("--------------------------------------------------");
+    DocumentSnapshot<Map<String, dynamic>> vari = await FirebaseFirestore
+        .instance
+        .collection("rooms")
+        .doc(roomIdController.text.toString())
+        .get();
+    roomModel room = roomModel.fromMap(vari.data()!);
+    print(room.adminId);
 
-
-
-//         User currentUser = await getCurrentUser();
-//         print("=========================================");
-//         FirebaseFirestore.instance
-//             .collection("users")
-//             .doc(currentUser.uid)
-//             .update({"joinedRoom": room.rid});
-//         Navigator.pushReplacement(
-//             context,
-//             MaterialPageRoute(
-//                 builder: (context) => RoomScreen(
-//                       isAdmin: false,
-//                       roomdetails: room,
-//                     )));
-//       });
-//     });
+    print("-----------------------------6464----------");
+    // User currentUser = await getCurrentUser();
+    //     FirebaseFirestore.instance
+    //         .collection("users")
+    //         .doc(currentUser.uid)
+    //         .update({"joinedRoom": room.rid});
+    //     Navigator.pushReplacement(
+    //         context,
+    //         MaterialPageRoute(
+    //             builder: (context) => RoomScreen(
+    //                   isAdmin: false,
+    //                   roomdetails: room,
+    //                 )));
+    //   });
+    // });
   }
 
   @override
