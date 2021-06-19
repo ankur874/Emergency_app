@@ -1,13 +1,11 @@
-import 'package:emergency_app/Model/userModel.dart';
 import 'package:emergency_app/Resources/Auth.dart';
+import 'package:emergency_app/Resources/shared_prefs.dart';
 import 'package:emergency_app/Screens/Home_Screen.dart';
 import 'package:emergency_app/Screens/Sign_In.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class SignUp extends StatefulWidget {
-
-
   @override
   _SignUpState createState() => _SignUpState();
 }
@@ -17,7 +15,7 @@ class _SignUpState extends State<SignUp> {
   Widget build(BuildContext context) {
     TextEditingController _emailController = new TextEditingController();
     TextEditingController _passwordController = new TextEditingController();
-
+    final SharedPrefs sharedPrefs = SharedPrefs();
     Future<void> SignUpUser() async {
       print(_emailController.text);
       print(_passwordController.text);
@@ -26,8 +24,11 @@ class _SignUpState extends State<SignUp> {
             _emailController.text, _passwordController.text);
         if (signedUpUser != null) {
           uploadToDb(signedUpUser.user!).then((value) {
-            Navigator.push(
+            sharedPrefs.saveUserSettings(true, _emailController.text, _passwordController.text).whenComplete((){
+                    Navigator.push(
                 context, MaterialPageRoute(builder: (context) => HomeScreen()));
+            });
+           
           });
         }
       } catch (e) {

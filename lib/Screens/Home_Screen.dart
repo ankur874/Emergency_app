@@ -1,6 +1,8 @@
 import 'package:emergency_app/Resources/Auth.dart';
+import 'package:emergency_app/Resources/shared_prefs.dart';
 import 'package:emergency_app/Screens/Create_Room.dart';
 import 'package:emergency_app/Screens/Joining_Screen.dart';
+import 'package:emergency_app/Screens/Sign_In.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -9,15 +11,19 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final SharedPrefs sharedPrefs = SharedPrefs();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         actions: [
           IconButton(
-              onPressed: () {
+              onPressed: () async {
                 signOut();
-                Navigator.pop(context);
+                await sharedPrefs.removeUserSettings().whenComplete(() {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => SignIn()));
+                });
               },
               icon: Icon(Icons.logout))
         ],

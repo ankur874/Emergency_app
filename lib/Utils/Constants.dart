@@ -1,5 +1,8 @@
+import 'package:emergency_app/Screens/Splash_Screen.dart';
 import 'package:flutter/material.dart';
 
+const String splash = "/splash";
+final routes = {splash:(context)=>SplashScreen()};
 Widget formField(String hintText) {
   return TextFormField(
     decoration: InputDecoration(

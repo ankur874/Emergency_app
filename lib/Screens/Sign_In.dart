@@ -1,4 +1,5 @@
 import 'package:emergency_app/Resources/Auth.dart';
+import 'package:emergency_app/Resources/shared_prefs.dart';
 import 'package:emergency_app/Screens/Home_Screen.dart';
 import 'package:emergency_app/Screens/Sign_Up.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -14,12 +15,16 @@ class SignIn extends StatefulWidget {
 class _SignInState extends State<SignIn> {
   TextEditingController _email = new TextEditingController();
   TextEditingController _password = new TextEditingController();
+  final SharedPrefs sharedPrefs = SharedPrefs();
   signInUser() async {
     try {
       UserCredential user = await signInWithEmail(_email.text, _password.text);
       if (user != null) {
-        Navigator.push(
+        sharedPrefs.saveUserSettings(true, _email.text, _password.text).whenComplete((){
+                  Navigator.push(
             context, MaterialPageRoute(builder: (context) => HomeScreen()));
+        });
+       
       }
     } catch (e) {
       print(e);
