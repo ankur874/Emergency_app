@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:emergency_app/Resources/shared_prefs.dart';
 import 'package:emergency_app/Screens/Home_Screen.dart';
+import 'package:emergency_app/Screens/Room_Screen.dart';
 import 'package:emergency_app/Screens/Sign_In.dart';
 import 'package:flutter/material.dart';
 
@@ -12,16 +13,23 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   final SharedPrefs _sharedPrefs = SharedPrefs();
+  bool isLoading = true;
   @override
   void initState() {
-    _sharedPrefs.getUserState().then((value) {
+    _sharedPrefs.getUserRoom().then((value)async {
       if (value != null) {
-       
-             Navigator.push(context,
-                MaterialPageRoute(builder: (context) => HomeScreen()));
+        this.setState(() {
+          isLoading = false;
+        });
+        
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => RoomScreen()));
       } else {
-        Navigator.push(context,
-                MaterialPageRoute(builder: (context) => SignIn()));
+        this.setState(() {
+          isLoading = false;
+        });
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => SignIn()));
       }
     });
     super.initState();
@@ -30,7 +38,8 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(child: Icon(Icons.zoom_out),),
-    );
+        body: Center(
+      child: isLoading ? CircularProgressIndicator() : Container(),
+    ));
   }
 }

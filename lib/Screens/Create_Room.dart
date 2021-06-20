@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:emergency_app/Model/roomModel.dart';
 import 'package:emergency_app/Resources/Auth.dart';
+import 'package:emergency_app/Resources/shared_prefs.dart';
 import 'package:emergency_app/Screens/Room_Screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +13,7 @@ class CreateRoom extends StatefulWidget {
 }
 
 class _CreateRoomState extends State<CreateRoom> {
+  SharedPrefs sharedPrefs = new SharedPrefs();
   TextEditingController roomNameController = new TextEditingController();
   String currentUserId = FirebaseAuth.instance.currentUser!.uid;
   changeUserDetails(roomModel newRoom) async {
@@ -61,13 +63,13 @@ class _CreateRoomState extends State<CreateRoom> {
                             roomName: roomNameController.text);
                         uploadRoomToDb(newRoom);
                         changeUserDetails(newRoom);
-                        Navigator.pushReplacement(
+                        sharedPrefs.saveUserRoom(true).whenComplete(() {
+                              Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => RoomScreen(
-                                      roomdetails: newRoom,
-                                      isAdmin: true,
-                                    )));
+                                builder: (context) => RoomScreen()));
+                        });
+                       
                       },
                       child: Text("Create Room"))),
             ],

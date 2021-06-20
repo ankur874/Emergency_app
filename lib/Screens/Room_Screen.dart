@@ -1,24 +1,48 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:emergency_app/Model/roomModel.dart';
+import 'package:emergency_app/Model/userModel.dart';
 import 'package:emergency_app/Resources/Auth.dart';
-import 'package:emergency_app/Screens/Home_Screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class RoomScreen extends StatefulWidget {
-  final roomdetails;
-  final isAdmin;
-  RoomScreen({this.roomdetails, this.isAdmin});
   @override
   _RoomScreenState createState() => _RoomScreenState();
 }
 
 class _RoomScreenState extends State<RoomScreen> {
-  // deleteRoom() async {
-  //   Future<User> currentuser = getCurrentUser();
-  //   print("helooooooooooooooooooooooooo");
-  //   Navigator.pushReplacement(
-  //       context, MaterialPageRoute(builder: (context) => HomeScreen()));
-  // }
+  bool isLoading = true;
+  late String userEmail;
+  late String roomId;
+  late bool isAdmin =false;
+  String roomName = "rooms";
+  List<dynamic> mates = [];
+  List<String> matesEmail = [];
+   getUserDetails() async {
+    User joinedUser = await getCurrentUser();
+    String joinedUserId = joinedUser.uid;
+
+    DocumentSnapshot<Map<String, dynamic>> userMap = await FirebaseFirestore
+        .instance
+        .collection("users")
+        .doc(joinedUserId)
+        .get();
+    userClass _user = userClass.fromMap(userMap.data()!);
+    setState(() {
+      userEmail = _user.email;
+      roomId = _user.joinedRoom;
+      isAdmin = _user.isAdmin;
+      isLoading = false;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getUserDetails().whenComplete((){setState(() {
+      
+    });});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,19 +62,11 @@ class _RoomScreenState extends State<RoomScreen> {
                 ),
               ],
             ),
-            ListView.builder(
-                shrinkWrap: true,
-                itemCount: 20,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    title: Text("Ankur"),
-                  );
-                }),
           ],
         ),
       ),
       appBar: AppBar(
-        title: Text("Room"),
+        title: Text(roomName),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -67,7 +83,7 @@ class _RoomScreenState extends State<RoomScreen> {
               ),
               child: Center(
                   child: Text(
-                "SHAKE",
+                "CALL",
                 style: TextStyle(
                     fontSize: 50.0,
                     fontWeight: FontWeight.w600,
@@ -75,13 +91,14 @@ class _RoomScreenState extends State<RoomScreen> {
               )),
             ),
             SizedBox(height: 50),
-            widget.isAdmin == true
+            isAdmin == true
                 ? ElevatedButton(
                     onPressed: () {
                       //deleteRoom();
                     },
                     child: Text("Delete Room"))
                 : ElevatedButton(onPressed: () {}, child: Text("Leave Room")),
+            Text(userEmail),
           ],
         ),
       ),

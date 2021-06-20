@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:emergency_app/Model/roomModel.dart';
 import 'package:emergency_app/Model/userModel.dart';
 import 'package:emergency_app/Resources/Auth.dart';
+import 'package:emergency_app/Resources/shared_prefs.dart';
 import 'package:emergency_app/Screens/Room_Screen.dart';
 import 'package:emergency_app/Utils/Constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -14,7 +15,7 @@ class JoiningScreen extends StatefulWidget {
 
 class _JoiningScreenState extends State<JoiningScreen> {
   TextEditingController roomIdController = new TextEditingController();
-
+  SharedPrefs _sharedPrefs = new SharedPrefs();
   Future<void> joinRoom() async {
     print("--------------------------------------------------");
     DocumentSnapshot<Map<String, dynamic>> vari = await FirebaseFirestore
@@ -37,13 +38,12 @@ class _JoiningScreenState extends State<JoiningScreen> {
         .collection("users")
         .doc(currentUser.uid)
         .update({"joinedRoom": room.rid}).then((value) {
-      Navigator.pushReplacement(
+      _sharedPrefs.saveUserRoom(true).whenComplete(() {
+        Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-              builder: (context) => RoomScreen(
-                    isAdmin: false,
-                    roomdetails: room,
-                  )));
+              builder: (context) => RoomScreen()));
+      });
     });
   }
 

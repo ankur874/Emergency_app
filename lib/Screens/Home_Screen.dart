@@ -3,6 +3,7 @@ import 'package:emergency_app/Resources/shared_prefs.dart';
 import 'package:emergency_app/Screens/Create_Room.dart';
 import 'package:emergency_app/Screens/Joining_Screen.dart';
 import 'package:emergency_app/Screens/Sign_In.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -12,6 +13,12 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final SharedPrefs sharedPrefs = SharedPrefs();
+  
+
+  @override
+  void initState() {
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -64,7 +71,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         MaterialPageRoute(builder: (context) => CreateRoom()));
                   },
                   child: Text(
-                    "Create a class",
+                    "Create a class" ,
                     style: TextStyle(fontSize: 16.0),
                   ),
                 ),
