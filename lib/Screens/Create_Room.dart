@@ -13,9 +13,9 @@ class CreateRoom extends StatefulWidget {
 }
 
 class _CreateRoomState extends State<CreateRoom> {
-  SharedPrefs sharedPrefs = new SharedPrefs();
   TextEditingController roomNameController = new TextEditingController();
   String currentUserId = FirebaseAuth.instance.currentUser!.uid;
+  final SharedPrefs sharedPrefs = SharedPrefs();
   changeUserDetails(roomModel newRoom) async {
     User currentUser = await getCurrentUser();
     FirebaseFirestore.instance
@@ -64,10 +64,11 @@ class _CreateRoomState extends State<CreateRoom> {
                         uploadRoomToDb(newRoom);
                         changeUserDetails(newRoom);
                         sharedPrefs.saveUserRoom(true).whenComplete(() {
-                              Navigator.pushReplacement(
+                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
                                 builder: (context) => RoomScreen()));
+                        ;
                         });
                        
                       },

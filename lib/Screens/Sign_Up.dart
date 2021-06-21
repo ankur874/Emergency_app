@@ -16,7 +16,7 @@ class _SignUpState extends State<SignUp> {
     TextEditingController _emailController = new TextEditingController();
     TextEditingController _passwordController = new TextEditingController();
     final SharedPrefs sharedPrefs = SharedPrefs();
-    Future<void> SignUpUser() async {
+     SignUpUser() async {
       print(_emailController.text);
       print(_passwordController.text);
       try {
@@ -24,7 +24,7 @@ class _SignUpState extends State<SignUp> {
             _emailController.text, _passwordController.text);
         if (signedUpUser != null) {
           uploadToDb(signedUpUser.user!).then((value) {
-            sharedPrefs.saveUserSettings(true, _emailController.text, _passwordController.text).whenComplete((){
+            sharedPrefs.saveUserSettings(true).whenComplete((){
                     Navigator.push(
                 context, MaterialPageRoute(builder: (context) => HomeScreen()));
             });

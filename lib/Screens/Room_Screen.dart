@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:emergency_app/Model/roomModel.dart';
 import 'package:emergency_app/Model/userModel.dart';
 import 'package:emergency_app/Resources/Auth.dart';
+import 'package:emergency_app/Resources/shared_prefs.dart';
+import 'package:emergency_app/Screens/Home_Screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -14,11 +16,14 @@ class _RoomScreenState extends State<RoomScreen> {
   bool isLoading = true;
   late String userEmail;
   late String roomId;
-  late bool isAdmin =false;
-  String roomName = "rooms";
+  late bool isAdmin;
+  String adminEmail = "";
+  late String roomName = "rooms";
   List<dynamic> mates = [];
   List<String> matesEmail = [];
-   getUserDetails() async {
+  late roomModel realRoom;
+  final SharedPrefs sharedPrefs = SharedPrefs();
+  getUserDetails() async {
     User joinedUser = await getCurrentUser();
     String joinedUserId = joinedUser.uid;
 
@@ -34,14 +39,76 @@ class _RoomScreenState extends State<RoomScreen> {
       isAdmin = _user.isAdmin;
       isLoading = false;
     });
+    DocumentSnapshot<Map<String, dynamic>> myRoom =
+        await FirebaseFirestore.instance.collection("rooms").doc(roomId).get();
+    roomModel room = roomModel.fromMap(myRoom.data()!);
+    String adminId = room.adminId;
+
+    realRoom = room;
+    mates = room.mates;
+    for (int i = 0; i < mates.length; i++) {
+      DocumentSnapshot<Map<String, dynamic>> data = await FirebaseFirestore
+          .instance
+          .collection("users")
+          .doc(mates[i])
+          .get();
+      matesEmail.add(data.data()!["email"]);
+    }
+    DocumentSnapshot<Map<String, dynamic>> su =
+        await FirebaseFirestore.instance.collection("users").doc(adminId).get();
+    userClass user = userClass.fromMap(su.data()!);
+    this.setState(() {
+      adminEmail = user.email;
+    });
+  }
+
+  leaveRoom() async {
+    User joinedUser = await getCurrentUser();
+    String joinedUserId = joinedUser.uid;
+    if (!isAdmin) {
+      for (int i = 0; i < mates.length; i++) {
+        if (mates[i] == joinedUserId) {
+          mates.removeAt(i);
+          break;
+        }
+      }
+      await FirebaseFirestore.instance
+          .collection("rooms")
+          .doc(roomId)
+          .update({"mates": mates});
+      await FirebaseFirestore.instance
+          .collection("users")
+          .doc(joinedUserId)
+          .update({"joinedRoom": "", "isAdmin": false});
+    } else {
+      await FirebaseFirestore.instance
+          .collection("users")
+          .doc(joinedUserId)
+          .update({"joinedRoom": "", "isAdmin": false});
+      late String newAdmin;
+      if (mates.length >= 1) {
+        newAdmin = mates[0];
+        mates.removeAt(0);
+        await FirebaseFirestore.instance
+            .collection("rooms")
+            .doc(roomId)
+            .update({"adminId": newAdmin, "mates": mates});
+        await FirebaseFirestore.instance
+            .collection("users")
+            .doc(newAdmin)
+            .update({"isAdmin": true});
+      } else {}
+    }
+    sharedPrefs.removeRoomSettings().whenComplete(() {
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => HomeScreen()));
+    });
   }
 
   @override
   void initState() {
     super.initState();
-    getUserDetails().whenComplete((){setState(() {
-      
-    });});
+    getUserDetails();
   }
 
   @override
@@ -51,17 +118,42 @@ class _RoomScreenState extends State<RoomScreen> {
         child: ListView(
           shrinkWrap: true,
           children: [
-            Row(
-              children: [
-                Expanded(
-                  child: DrawerHeader(
-                    curve: Curves.easeIn,
-                    decoration: BoxDecoration(color: Colors.red),
-                    child: Text("Room Participants"),
-                  ),
-                ),
-              ],
+            DrawerHeader(
+              decoration: BoxDecoration(color: Colors.red.shade500),
+              child: Center(
+                  child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Text("Admin"),
+                  Text(adminEmail),
+                ],
+              )),
             ),
+            Center(
+                child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                "Room Participants",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            )),
+            ListView.builder(
+                itemCount: matesEmail.length,
+                shrinkWrap: true,
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                      decoration:
+                          BoxDecoration(color: Colors.white, boxShadow: [
+                        BoxShadow(blurRadius: 2, color: Colors.grey.shade100)
+                      ]),
+                      child: ListTile(
+                        title: Text(matesEmail[index]),
+                      ),
+                    ),
+                  );
+                }),
           ],
         ),
       ),
@@ -91,13 +183,32 @@ class _RoomScreenState extends State<RoomScreen> {
               )),
             ),
             SizedBox(height: 50),
-            isAdmin == true
-                ? ElevatedButton(
-                    onPressed: () {
-                      //deleteRoom();
-                    },
-                    child: Text("Delete Room"))
-                : ElevatedButton(onPressed: () {}, child: Text("Leave Room")),
+            ElevatedButton(
+                onPressed: () {
+                  showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: Text("Leave!"),
+                          content:
+                              Text("Are you sure you want to leave this room?"),
+                          actions: [
+                            TextButton(
+                                onPressed: () {
+                                  leaveRoom();
+                                },
+                                child: Text("Yes")),
+                            TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: Text("No")),
+                          ],
+                        );
+                        ;
+                      });
+                },
+                child: Text("Leave Room")),
             Text(userEmail),
           ],
         ),

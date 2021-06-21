@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:emergency_app/Resources/shared_prefs.dart';
 import 'package:emergency_app/Screens/Home_Screen.dart';
 import 'package:emergency_app/Screens/Room_Screen.dart';
@@ -16,18 +14,18 @@ class _SplashScreenState extends State<SplashScreen> {
   bool isLoading = true;
   @override
   void initState() {
-    _sharedPrefs.getUserRoom().then((value)async {
+    _sharedPrefs.getUserState().then((value) async {
       if (value != null) {
-        this.setState(() {
-          isLoading = false;
+        _sharedPrefs.getUserRoom().then((event) {
+          if (event != null) {
+            Navigator.pushReplacement(
+                context, MaterialPageRoute(builder: (context) => RoomScreen()));
+          } else {
+            Navigator.pushReplacement(
+                context, MaterialPageRoute(builder: (context) => HomeScreen()));
+          }
         });
-        
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => RoomScreen()));
       } else {
-        this.setState(() {
-          isLoading = false;
-        });
         Navigator.pushReplacement(
             context, MaterialPageRoute(builder: (context) => SignIn()));
       }

@@ -20,7 +20,7 @@ class _SignInState extends State<SignIn> {
     try {
       UserCredential user = await signInWithEmail(_email.text, _password.text);
       if (user != null) {
-        sharedPrefs.saveUserSettings(true, _email.text, _password.text).whenComplete((){
+        sharedPrefs.saveUserSettings(true).whenComplete((){
                   Navigator.push(
             context, MaterialPageRoute(builder: (context) => HomeScreen()));
         });
