@@ -20,11 +20,10 @@ class _SignInState extends State<SignIn> {
     try {
       UserCredential user = await signInWithEmail(_email.text, _password.text);
       if (user != null) {
-        sharedPrefs.saveUserSettings(true).whenComplete((){
-                  Navigator.push(
-            context, MaterialPageRoute(builder: (context) => HomeScreen()));
+        sharedPrefs.saveUserSettings(true).whenComplete(() {
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => HomeScreen()));
         });
-       
       }
     } catch (e) {
       print(e);
@@ -34,96 +33,106 @@ class _SignInState extends State<SignIn> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.red.shade100,
+      backgroundColor: Color(0xffFB9300),
       body: Container(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Container(
-                    width: MediaQuery.of(context).size.width / 1.2,
-                    child: TextFormField(
-                      controller: _email,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontWeight: FontWeight.w500),
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Colors.blueGrey.shade300,
-                        contentPadding:
-                            EdgeInsets.symmetric(horizontal: 10, vertical: 18),
-                        hintText: "Email",
-                        hintStyle: TextStyle(fontSize: 16.0),
-                        enabledBorder: OutlineInputBorder(
-                            borderSide:
-                                BorderSide(color: Colors.blueGrey.shade300),
-                            borderRadius: BorderRadius.circular(20.0)),
-                        focusedBorder: OutlineInputBorder(
-                            borderSide:
-                                BorderSide(color: Colors.blueGrey.shade300),
-                            borderRadius: BorderRadius.circular(20.0)),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 30),
-                  Container(
-                      width: MediaQuery.of(context).size.width / 1.2,
-                      child: TextFormField(
-                        textAlign: TextAlign.center,
-                        controller: _password,
-                        style: TextStyle(fontWeight: FontWeight.w500),
-                        decoration: InputDecoration(
-                          filled: true,
-                          fillColor: Colors.blueGrey.shade300,
-                          contentPadding: EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 18),
-                          hintText: "Password",
-                          hintStyle: TextStyle(fontSize: 16.0),
-                          enabledBorder: OutlineInputBorder(
-                              borderSide:
-                                  BorderSide(color: Colors.blueGrey.shade300),
-                              borderRadius: BorderRadius.circular(20.0)),
-                          focusedBorder: OutlineInputBorder(
-                              borderSide:
-                                  BorderSide(color: Colors.blueGrey.shade300),
-                              borderRadius: BorderRadius.circular(20.0)),
-                        ),
-                      )),
-                  SizedBox(height: 30),
-                  Container(
-                    height: 45,
-                    width: MediaQuery.of(context).size.width / 2.5,
-                    child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                            primary: Colors.red.shade400),
-                        onPressed: () {
-                          signInUser();
-                        },
-                        child: Text("Sign In")),
-                  ),
-                  SizedBox(height: 20),
-                  Row(
+            Hero(
+              tag: "signInsignUp",
+              child: Center(
+                child: Container(
+                  padding: EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                      color: Color(0xffF5E6CA),
+                      borderRadius: BorderRadius.circular(30)),
+                  height: 300,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Text("Create an account? "),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => SignUp()));
-                        },
-                        child: Text(
-                          "Register",
-                          style:
-                              TextStyle(decoration: TextDecoration.underline),
+                      Container(
+                        width: MediaQuery.of(context).size.width / 1.2,
+                        child: TextFormField(
+                          controller: _email,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontWeight: FontWeight.w500),
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: Colors.blueGrey.shade300,
+                            contentPadding: EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 18),
+                            hintText: "Email",
+                            hintStyle: TextStyle(fontSize: 16.0),
+                            enabledBorder: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Colors.blueGrey.shade300),
+                                borderRadius: BorderRadius.circular(20.0)),
+                            focusedBorder: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Colors.blueGrey.shade300),
+                                borderRadius: BorderRadius.circular(20.0)),
+                          ),
                         ),
-                      )
+                      ),
+                      SizedBox(height: 30),
+                      Container(
+                          width: MediaQuery.of(context).size.width / 1.2,
+                          child: TextFormField(
+                            textAlign: TextAlign.center,
+                            controller: _password,
+                            style: TextStyle(fontWeight: FontWeight.w500),
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: Colors.blueGrey.shade300,
+                              contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 18),
+                              hintText: "Password",
+                              hintStyle: TextStyle(fontSize: 16.0),
+                              enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: Colors.blueGrey.shade300),
+                                  borderRadius: BorderRadius.circular(20.0)),
+                              focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: Colors.blueGrey.shade300),
+                                  borderRadius: BorderRadius.circular(20.0)),
+                            ),
+                          )),
+                      SizedBox(height: 30),
+                      Container(
+                        height: 45,
+                        width: MediaQuery.of(context).size.width / 2.5,
+                        child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                                primary: Colors.red.shade400),
+                            onPressed: () {
+                              signInUser();
+                            },
+                            child: Text("Sign In")),
+                      ),
+                      SizedBox(height: 20),
+                      Row(
+                        children: [
+                          Text("Create an account? "),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => SignUp()));
+                            },
+                            child: Text(
+                              "Register",
+                              style: TextStyle(
+                                  decoration: TextDecoration.underline),
+                            ),
+                          )
+                        ],
+                      ),
                     ],
                   ),
-                ],
+                ),
               ),
             ),
           ],
