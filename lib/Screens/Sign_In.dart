@@ -28,7 +28,7 @@ class _SignInState extends State<SignIn> {
           isLoading = true;
         });
         sharedPrefs.saveUserSettings(true).whenComplete(() {
-          Navigator.push(
+          Navigator.pushReplacement(
               context, MaterialPageRoute(builder: (context) => HomeScreen()));
         });
       }
@@ -55,16 +55,32 @@ class _SignInState extends State<SignIn> {
               color: Color(0xffF54748),
             ))
           : Container(
-              child: Row(
+              child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  Hero(
+                    tag: "logo",
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          "assets/logo.gif",
+                          scale: 12,
+                        )
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 50),
                   Center(
                     child: Container(
-                      padding: EdgeInsets.all(10),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                       decoration: BoxDecoration(
+                          boxShadow: [BoxShadow(blurRadius: 10)],
                           color: Color(0xffF5E6CA),
                           borderRadius: BorderRadius.circular(30)),
-                      height: 300,
+                      height: MediaQuery.of(context).size.height / 2.4,
+                      width: MediaQuery.of(context).size.width / 1.1,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -134,6 +150,7 @@ class _SignInState extends State<SignIn> {
                           ),
                           SizedBox(height: 20),
                           Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text("Create an account? "),
                               GestureDetector(

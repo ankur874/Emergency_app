@@ -29,6 +29,7 @@ class _CreateRoomState extends State<CreateRoom> {
     return Scaffold(
         appBar: AppBar(
           title: Text("Create Room"),
+          backgroundColor: Color(0xff343F56),
         ),
         body: Center(
           child: Column(
@@ -64,13 +65,12 @@ class _CreateRoomState extends State<CreateRoom> {
                         uploadRoomToDb(newRoom);
                         changeUserDetails(newRoom);
                         sharedPrefs.saveUserRoom(true).whenComplete(() {
-                           Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => RoomScreen()));
-                        ;
+                          Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => RoomScreen()));
+                          ;
                         });
-                       
                       },
                       child: Text("Create Room"))),
             ],

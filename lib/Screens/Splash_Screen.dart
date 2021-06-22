@@ -37,7 +37,13 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         body: Center(
-      child: isLoading ? CircularProgressIndicator() : Container(),
+      child: isLoading
+          ? CircularProgressIndicator(
+              color: Colors.red,
+              backgroundColor: Colors.black,
+              strokeWidth: 6,
+            )
+          : Container(),
     ));
   }
 }

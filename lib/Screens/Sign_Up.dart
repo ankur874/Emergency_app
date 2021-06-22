@@ -33,7 +33,7 @@ class _SignUpState extends State<SignUp> {
           });
           uploadToDb(signedUpUser.user!).then((value) {
             sharedPrefs.saveUserSettings(true).whenComplete(() {
-              Navigator.push(context,
+              Navigator.pushReplacement(context,
                   MaterialPageRoute(builder: (context) => HomeScreen()));
             });
           });
@@ -59,17 +59,32 @@ class _SignUpState extends State<SignUp> {
               ),
             )
           : Container(
-              child: Row(
+              child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+                  Hero(
+                    tag: "logo",
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          "assets/logo.gif",
+                          scale: 12,
+                        )
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 50),
                   Center(
                     child: Container(
-                      padding: EdgeInsets.all(10),
+                      padding:
+                          EdgeInsets.symmetric(vertical: 10, horizontal: 16),
                       decoration: BoxDecoration(
+                          boxShadow: [BoxShadow(blurRadius: 10)],
                           color: Color(0xffF5E6CA),
                           borderRadius: BorderRadius.circular(30)),
-                      height: 400,
+                      height: MediaQuery.of(context).size.height / 2,
+                      width: MediaQuery.of(context).size.width / 1.1,
                       child: Form(
                         key: formKey,
                         child: Column(
@@ -187,6 +202,7 @@ class _SignUpState extends State<SignUp> {
                             ),
                             SizedBox(height: 20),
                             Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text("Already registered? "),
                                 GestureDetector(

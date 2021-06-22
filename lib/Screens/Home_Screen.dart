@@ -13,12 +13,12 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final SharedPrefs sharedPrefs = SharedPrefs();
-  
 
   @override
   void initState() {
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,14 +28,17 @@ class _HomeScreenState extends State<HomeScreen> {
               onPressed: () async {
                 signOut();
                 await sharedPrefs.removeUserSettings().whenComplete(() {
-                  Navigator.push(context,
+                  Navigator.pushReplacement(context,
                       MaterialPageRoute(builder: (context) => SignIn()));
                 });
               },
               icon: Icon(Icons.logout))
         ],
+        backgroundColor: Color(0xff343F56),
         centerTitle: true,
-        title: Text("Attendance"),
+        title: Text(
+          "Emergency",
+        ),
       ),
       body: Container(
         child: Column(
@@ -47,6 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 width: MediaQuery.of(context).size.width,
                 height: 50,
                 child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(primary: Color(0xffFB9300)),
                   onPressed: () {
                     Navigator.push(
                         context,
@@ -66,12 +70,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 width: MediaQuery.of(context).size.width,
                 height: 50,
                 child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(primary: Color(0xffF54748)),
                   onPressed: () {
                     Navigator.push(context,
                         MaterialPageRoute(builder: (context) => CreateRoom()));
                   },
                   child: Text(
-                    "Create a class" ,
+                    "Create a class",
                     style: TextStyle(fontSize: 16.0),
                   ),
                 ),
