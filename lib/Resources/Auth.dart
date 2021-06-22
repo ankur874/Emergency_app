@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:emergency_app/Model/roomModel.dart';
 import 'package:emergency_app/Model/userModel.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 FirebaseAuth firebaseAuth = FirebaseAuth.instance;
 Future<UserCredential> signupWithEmail(String email, String password) async {
@@ -10,6 +11,12 @@ Future<UserCredential> signupWithEmail(String email, String password) async {
     UserCredential userCredential = await FirebaseAuth.instance
         .createUserWithEmailAndPassword(email: email, password: password);
     user = userCredential;
+  } on FirebaseAuthException catch (e) {
+    if (e.code == "weak-password") {
+      Fluttertoast.showToast(msg: "Entered password is too weak!");
+    } else if (e.code == "email-already-in-use") {
+      Fluttertoast.showToast(msg: "Email already exists!");
+    }
   } catch (e) {
     print(e);
   }
@@ -22,6 +29,12 @@ Future<UserCredential> signInWithEmail(String email, String password) async {
     UserCredential userCredential = await FirebaseAuth.instance
         .signInWithEmailAndPassword(email: email, password: password);
     user = userCredential;
+  } on FirebaseAuthException catch (e) {
+    if (e.code == "user-not-found") {
+      Fluttertoast.showToast(msg: "User not found!");
+    } else if (e.code == "wrong-password") {
+      Fluttertoast.showToast(msg: "Wrong password!");
+    }
   } catch (e) {
     print(e);
   }
