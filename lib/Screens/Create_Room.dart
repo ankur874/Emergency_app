@@ -53,6 +53,8 @@ class _CreateRoomState extends State<CreateRoom> {
                   width: MediaQuery.of(context).size.width / 3,
                   height: 40.0,
                   child: ElevatedButton(
+                      style:
+                          ElevatedButton.styleFrom(primary: Color(0xffF54748)),
                       onPressed: () {
                         var id = customAlphabet(
                             roomNameController.text + "123456789", 10);
