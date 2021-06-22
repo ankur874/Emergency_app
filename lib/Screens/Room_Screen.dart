@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:emergency_app/Model/roomModel.dart';
 import 'package:emergency_app/Model/userModel.dart';
@@ -14,7 +16,7 @@ class RoomScreen extends StatefulWidget {
 
 class _RoomScreenState extends State<RoomScreen> {
   bool isLoading = true;
-  late String userEmail;
+  late String userEmail = "";
   late String roomId;
   late bool isAdmin;
   String adminEmail = "";
@@ -188,24 +190,30 @@ class _RoomScreenState extends State<RoomScreen> {
                   showDialog(
                       context: context,
                       builder: (context) {
-                        return AlertDialog(
-                          title: Text("Leave!"),
-                          content:
-                              Text("Are you sure you want to leave this room?"),
-                          actions: [
-                            TextButton(
-                                onPressed: () {
-                                  leaveRoom();
-                                },
-                                child: Text("Yes")),
-                            TextButton(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                                child: Text("No")),
-                          ],
+                        return BackdropFilter(
+                          filter: ImageFilter.blur(
+                              sigmaX: 1,
+                              sigmaY: 1,
+                              tileMode: TileMode.repeated),
+                          child: AlertDialog(
+                            
+                            title: Text("Leave!"),
+                            content: Text(
+                                "Are you sure you want to leave this room?"),
+                            actions: [
+                              TextButton(
+                                  onPressed: () {
+                                    leaveRoom();
+                                  },
+                                  child: Text("Yes")),
+                              TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: Text("No")),
+                            ],
+                          ),
                         );
-                        ;
                       });
                 },
                 child: Text("Leave Room")),
