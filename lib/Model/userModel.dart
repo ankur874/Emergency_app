@@ -5,19 +5,22 @@ class userClass {
   String email = "";
   String joinedRoom = "";
   bool isAdmin = false;
+  String tokenId = "";
 
   userClass(
       {required this.uid,
       required this.email,
       required this.joinedRoom,
-      required this.isAdmin});
+      required this.isAdmin,
+      required this.tokenId});
 
   Map<String, dynamic> toMap(userClass user) {
     Map<String, dynamic> data = {
       "uid": user.uid,
       "email": user.email,
       "joinedRoom": user.joinedRoom,
-      "isAdmin": user.isAdmin
+      "isAdmin": user.isAdmin,
+      "tokenId": user.tokenId
     };
     return data;
   }
@@ -27,5 +30,6 @@ class userClass {
     this.uid = mapData["uid"];
     this.joinedRoom = mapData["joinedRoom"];
     this.isAdmin = mapData["isAdmin"];
+    this.tokenId = mapData["tokenId"];
   }
 }

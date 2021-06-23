@@ -2,7 +2,10 @@ import 'package:emergency_app/Resources/shared_prefs.dart';
 import 'package:emergency_app/Screens/Home_Screen.dart';
 import 'package:emergency_app/Screens/Room_Screen.dart';
 import 'package:emergency_app/Screens/Sign_In.dart';
+import 'package:emergency_app/main.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class SplashScreen extends StatefulWidget {
   @override

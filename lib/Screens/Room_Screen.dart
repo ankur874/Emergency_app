@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:emergency_app/Model/roomModel.dart';
@@ -5,9 +6,11 @@ import 'package:emergency_app/Model/userModel.dart';
 import 'package:emergency_app/Resources/Auth.dart';
 import 'package:emergency_app/Resources/shared_prefs.dart';
 import 'package:emergency_app/Screens/Home_Screen.dart';
+import 'package:emergency_app/Utils/Constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:http/http.dart';
 
 class RoomScreen extends StatefulWidget {
   @override
@@ -15,6 +18,36 @@ class RoomScreen extends StatefulWidget {
 }
 
 class _RoomScreenState extends State<RoomScreen> {
+  ///////////////////////////////////////////////////////////
+  Future<Response> sendNotification(
+      List<String> tokenIdList, String contents, String heading) async {
+    return await post(
+      Uri.parse('https://onesignal.com/api/v1/notifications'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, dynamic>{
+        "app_id":
+            kAppId, //kAppId is the App Id that one get from the OneSignal When the application is registered.
+
+        "include_player_ids":
+            tokenIdList, //tokenIdList Is the List of All the Token Id to to Whom notification must be sent.
+
+        // android_accent_color reprsent the color of the heading text in the notifiction
+        "android_accent_color": "FF9976D2",
+
+        //  "small_icon": "ic_stat_onesignal_default",
+
+        "large_icon": "assets/logo.jpg",
+
+        "headings": {"en": heading},
+
+        "contents": {"en": contents},
+      }),
+    );
+  }
+
+  ///////////////////////////////////////////////////////////
   bool isLoading = false;
   late String userEmail = "";
   late String roomId;
@@ -23,6 +56,7 @@ class _RoomScreenState extends State<RoomScreen> {
   String roomName = "";
   List<dynamic> mates = [];
   List<String> matesEmail = [];
+  List<String> tokenList = [];
   late roomModel realRoom;
   final SharedPrefs sharedPrefs = SharedPrefs();
   getUserDetails() async {
@@ -54,10 +88,12 @@ class _RoomScreenState extends State<RoomScreen> {
           .doc(mates[i])
           .get();
       matesEmail.add(data.data()!["email"]);
+      tokenList.add(data.data()!["tokenId"]);
     }
     DocumentSnapshot<Map<String, dynamic>> su =
         await FirebaseFirestore.instance.collection("users").doc(adminId).get();
     userClass user = userClass.fromMap(su.data()!);
+    tokenList.add(user.tokenId);
     this.setState(() {
       adminEmail = user.email;
       roomName = room.roomName;
@@ -191,10 +227,19 @@ class _RoomScreenState extends State<RoomScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
-                      FontAwesomeIcons.phoneSquareAlt,
-                      size: 300,
-                      color: Color(0xffF54748),
+                    GestureDetector(
+                      onDoubleTap: () {
+                        print("gg");
+                        // for (int i = 0; i < tokenList.length; i++) {
+                        sendNotification(tokenList, "It's emergency call",
+                            userEmail + " called an emergency meeting!");
+                        // }
+                      },
+                      child: Icon(
+                        FontAwesomeIcons.phoneSquareAlt,
+                        size: 300,
+                        color: Color(0xffF54748),
+                      ),
                     ),
                     SizedBox(height: 50),
                     ElevatedButton(

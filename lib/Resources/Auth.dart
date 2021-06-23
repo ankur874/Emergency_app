@@ -3,6 +3,7 @@ import 'package:emergency_app/Model/roomModel.dart';
 import 'package:emergency_app/Model/userModel.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 FirebaseAuth firebaseAuth = FirebaseAuth.instance;
 Future<UserCredential> signupWithEmail(String email, String password) async {
@@ -48,7 +49,10 @@ Future<User> getCurrentUser() async {
 }
 
 Future<void> uploadToDb(User currentUser) async {
+  var status = await OneSignal.shared.getDeviceState();
+  String ?tokenId = status!.userId;
   userClass userclass = userClass(
+      tokenId:tokenId! ,
       uid: currentUser.uid,
       email: currentUser.email!,
       joinedRoom: "",
