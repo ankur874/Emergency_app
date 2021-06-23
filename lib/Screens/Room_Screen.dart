@@ -62,34 +62,6 @@ class _RoomScreenState extends State<RoomScreen> {
   }
 
   ///////////////////////////////////////////
-  fillTokensList() async {
-    Stream<DocumentSnapshot<Map<String, dynamic>>> stream =
-        await FirebaseFirestore.instance
-            .collection("rooms")
-            .doc(roomId)
-            .snapshots();
-    stream.listen((event) {
-      roomModel room = roomModel.fromMap(event.data()!);
-      List<dynamic> adminId = room.mates;
-      String adminIdRoom = room.adminId;
-      for (int i = 0; i < adminId.length; i++) {
-        FirebaseFirestore.instance
-            .collection("users")
-            .doc(adminId[i])
-            .snapshots()
-            .listen((event1) {
-          tokenList.add(event1.data()!["tokenId"]);
-          FirebaseFirestore.instance
-              .collection("users")
-              .doc(adminIdRoom)
-              .snapshots()
-              .listen((event3) {
-            tokenList.add(event3.data()!["tokenId"]);
-          });
-        });
-      }
-    });
-  }
 
   getUserDetails() async {
     User joinedUser = await getCurrentUser();
@@ -128,6 +100,32 @@ class _RoomScreenState extends State<RoomScreen> {
       adminEmail = user.email;
       roomName = room.roomName;
     });
+    Stream<DocumentSnapshot<Map<String, dynamic>>> stream =
+        await FirebaseFirestore.instance
+            .collection("rooms")
+            .doc(roomId)
+            .snapshots();
+    stream.listen((event) {
+      roomModel room = roomModel.fromMap(event.data()!);
+      List<dynamic> adminId = room.mates;
+      String adminIdRoom = room.adminId;
+      for (int i = 0; i < adminId.length; i++) {
+        FirebaseFirestore.instance
+            .collection("users")
+            .doc(adminId[i])
+            .snapshots()
+            .listen((event1) {
+          tokenList.add(event1.data()!["tokenId"]);
+          FirebaseFirestore.instance
+              .collection("users")
+              .doc(adminIdRoom)
+              .snapshots()
+              .listen((event3) {
+            tokenList.add(event3.data()!["tokenId"]);
+          });
+        });
+      }
+    });
   }
 
   leaveRoom() async {
@@ -157,13 +155,21 @@ class _RoomScreenState extends State<RoomScreen> {
           .doc(joinedUserId)
           .update({"joinedRoom": "", "isAdmin": false});
       late String newAdmin;
-      if (mates.length >= 1) {
+      var stram = FirebaseFirestore.instance
+          .collection("rooms")
+          .doc(roomId)
+          .snapshots();
+      List<dynamic> matess = [];
+      stram.listen((e) {
+        matess = e.data()!["mates"];
+      });
+      if (matess.length >= 1) {
         newAdmin = mates[0];
-        mates.removeAt(0);
+        matess.removeAt(0);
         await FirebaseFirestore.instance
             .collection("rooms")
             .doc(roomId)
-            .update({"adminId": newAdmin, "mates": mates});
+            .update({"adminId": newAdmin, "mates": matess});
         await FirebaseFirestore.instance
             .collection("users")
             .doc(newAdmin)
@@ -186,7 +192,6 @@ class _RoomScreenState extends State<RoomScreen> {
   @override
   void initState() {
     super.initState();
-    fillTokensList();
     getUserDetails();
   }
 
@@ -259,12 +264,13 @@ class _RoomScreenState extends State<RoomScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     GestureDetector(
-                      onDoubleTap: () {
-                        print("gg");
+                      onTap: () {
+                        //print("gg");
+                        // print(tokenList.length);
                         for (int i = 0; i < tokenList.length; i++) {
-                          print(tokenList[i]);
-                          // sendNotification(tokenList, "It's emergency call",
-                          //     userEmail + " called an emergency meeting!");
+                          // print(tokenList[i]);
+                          sendNotification(tokenList, "It's emergency call",
+                              userEmail + " called an emergency meeting!");
                         }
                       },
                       child: Icon(
