@@ -34,6 +34,7 @@ dependencies:
   nanoid: ^1.0.0
   shared_preferences: ^2.0.6
   fluttertoast: ^8.0.7
+  font_awesome_flutter: ^9.1.0
 
 dev_dependencies:
   flutter_test:

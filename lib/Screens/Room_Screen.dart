@@ -1,5 +1,4 @@
 import 'dart:ui';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:emergency_app/Model/roomModel.dart';
 import 'package:emergency_app/Model/userModel.dart';
@@ -8,6 +7,7 @@ import 'package:emergency_app/Resources/shared_prefs.dart';
 import 'package:emergency_app/Screens/Home_Screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class RoomScreen extends StatefulWidget {
   @override
@@ -15,12 +15,12 @@ class RoomScreen extends StatefulWidget {
 }
 
 class _RoomScreenState extends State<RoomScreen> {
-  bool isLoading = true;
+  bool isLoading = false;
   late String userEmail = "";
   late String roomId;
   late bool isAdmin;
   String adminEmail = "";
-  late String roomName = "rooms";
+  String roomName = "";
   List<dynamic> mates = [];
   List<String> matesEmail = [];
   late roomModel realRoom;
@@ -45,7 +45,6 @@ class _RoomScreenState extends State<RoomScreen> {
         await FirebaseFirestore.instance.collection("rooms").doc(roomId).get();
     roomModel room = roomModel.fromMap(myRoom.data()!);
     String adminId = room.adminId;
-
     realRoom = room;
     mates = room.mates;
     for (int i = 0; i < mates.length; i++) {
@@ -61,10 +60,14 @@ class _RoomScreenState extends State<RoomScreen> {
     userClass user = userClass.fromMap(su.data()!);
     this.setState(() {
       adminEmail = user.email;
+      roomName = room.roomName;
     });
   }
 
   leaveRoom() async {
+    setState(() {
+      isLoading = true;
+    });
     User joinedUser = await getCurrentUser();
     String joinedUserId = joinedUser.uid;
     if (!isAdmin) {
@@ -99,11 +102,18 @@ class _RoomScreenState extends State<RoomScreen> {
             .collection("users")
             .doc(newAdmin)
             .update({"isAdmin": true});
-      } else {}
+      } else {
+        await FirebaseFirestore.instance
+            .collection("rooms")
+            .doc(roomId)
+            .delete();
+      }
     }
     sharedPrefs.removeRoomSettings().whenComplete(() {
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => HomeScreen()));
+      Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => HomeScreen()),
+          (route) => false);
     });
   }
 
@@ -115,112 +125,115 @@ class _RoomScreenState extends State<RoomScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      drawer: Drawer(
-        child: ListView(
-          shrinkWrap: true,
-          children: [
-            DrawerHeader(
-              decoration: BoxDecoration(color: Colors.red.shade500),
-              child: Center(
-                  child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Text("Admin"),
-                  Text(adminEmail),
-                ],
-              )),
+    return isLoading
+        ? Center(
+            child: CircularProgressIndicator(
+              backgroundColor: Colors.black,
+              strokeWidth: 6,
+              color: Color(0xffF54748),
             ),
-            Center(
-                child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                "Room Participants",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-            )),
-            ListView.builder(
-                itemCount: matesEmail.length,
+          )
+        : Scaffold(
+            drawer: Drawer(
+              child: ListView(
                 shrinkWrap: true,
-                itemBuilder: (context, index) {
-                  return Padding(
+                children: [
+                  DrawerHeader(
+                    decoration: BoxDecoration(color: Colors.red.shade500),
+                    child: Center(
+                        child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Text("Admin"),
+                        Text(adminEmail),
+                      ],
+                    )),
+                  ),
+                  Center(
+                      child: Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                      decoration:
-                          BoxDecoration(color: Colors.white, boxShadow: [
-                        BoxShadow(blurRadius: 2, color: Colors.grey.shade100)
-                      ]),
-                      child: ListTile(
-                        title: Text(matesEmail[index]),
-                      ),
+                    child: Text(
+                      "Room Participants",
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
-                  );
-                }),
-          ],
-        ),
-      ),
-      appBar: AppBar(
-        title: Text(roomName),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              height: 400,
-              width: MediaQuery.of(context).size.width,
-              decoration: BoxDecoration(
-                color: Colors.red,
-                boxShadow: [BoxShadow(color: Colors.grey, blurRadius: 50.0)],
-                borderRadius: BorderRadius.circular(100),
-              ),
-              child: Center(
-                  child: Text(
-                "CALL",
-                style: TextStyle(
-                    fontSize: 50.0,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white),
-              )),
-            ),
-            SizedBox(height: 50),
-            ElevatedButton(
-                onPressed: () {
-                  showDialog(
-                      context: context,
-                      builder: (context) {
-                        return BackdropFilter(
-                          filter: ImageFilter.blur(
-                              sigmaX: 1,
-                              sigmaY: 1,
-                              tileMode: TileMode.repeated),
-                          child: AlertDialog(
-                            
-                            title: Text("Leave!"),
-                            content: Text(
-                                "Are you sure you want to leave this room?"),
-                            actions: [
-                              TextButton(
-                                  onPressed: () {
-                                    leaveRoom();
-                                  },
-                                  child: Text("Yes")),
-                              TextButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                  child: Text("No")),
-                            ],
+                  )),
+                  ListView.builder(
+                      itemCount: matesEmail.length,
+                      shrinkWrap: true,
+                      itemBuilder: (context, index) {
+                        return Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Container(
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                boxShadow: [
+                                  BoxShadow(
+                                      blurRadius: 2,
+                                      color: Colors.grey.shade100)
+                                ]),
+                            child: ListTile(
+                              title: Text(matesEmail[index]),
+                            ),
                           ),
                         );
-                      });
-                },
-                child: Text("Leave Room")),
-            Text(userEmail),
-          ],
-        ),
-      ),
-    );
+                      }),
+                ],
+              ),
+            ),
+            appBar: AppBar(
+              title: Text(roomName),
+              backgroundColor: Color(0xff343F56),
+            ),
+            body: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      FontAwesomeIcons.phoneSquareAlt,
+                      size: 300,
+                      color: Color(0xffF54748),
+                    ),
+                    SizedBox(height: 50),
+                    ElevatedButton(
+                        onPressed: () {
+                          showDialog(
+                              context: context,
+                              builder: (context) {
+                                return BackdropFilter(
+                                  filter: ImageFilter.blur(
+                                      sigmaX: 1,
+                                      sigmaY: 1,
+                                      tileMode: TileMode.repeated),
+                                  child: AlertDialog(
+                                    title: Text("Leave!"),
+                                    content: Text(
+                                        "Are you sure you want to leave this room?"),
+                                    actions: [
+                                      TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                            leaveRoom();
+                                          },
+                                          child: Text("Yes")),
+                                      TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          child: Text("No")),
+                                    ],
+                                  ),
+                                );
+                              });
+                        },
+                        child: Text("Leave Room")),
+                    Text(userEmail),
+                  ],
+                ),
+              ),
+            ),
+          );
   }
 }

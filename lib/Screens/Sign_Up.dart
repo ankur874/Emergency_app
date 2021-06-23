@@ -56,12 +56,16 @@ class _SignUpState extends State<SignUp> {
               child: CircularProgressIndicator(
                 backgroundColor: Colors.black,
                 strokeWidth: 6,
+                color: Color(0xffF54748),
               ),
             )
-          : Container(
+          : SingleChildScrollView(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height / 5,
+                  ),
                   Hero(
                     tag: "logo",
                     child: Row(

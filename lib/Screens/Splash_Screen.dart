@@ -11,6 +11,7 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   final SharedPrefs _sharedPrefs = SharedPrefs();
+
   bool isLoading = true;
   @override
   void initState() {

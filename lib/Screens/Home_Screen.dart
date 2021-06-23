@@ -44,40 +44,46 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Padding(
-              padding: const EdgeInsets.all(13.0),
-              child: Container(
-                width: MediaQuery.of(context).size.width,
-                height: 50,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(primary: Color(0xffFB9300)),
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => JoiningScreen()));
-                  },
-                  child: Text(
-                    "Join a class",
-                    style: TextStyle(fontSize: 16.0),
+            Hero(
+              tag: "joinRoom",
+              child: Padding(
+                padding: const EdgeInsets.all(13.0),
+                child: Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: 50,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(primary: Color(0xffFB9300)),
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => JoiningScreen()));
+                    },
+                    child: Text(
+                      "Join a class",
+                      style: TextStyle(fontSize: 16.0),
+                    ),
                   ),
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(13.0),
-              child: Container(
-                width: MediaQuery.of(context).size.width,
-                height: 50,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(primary: Color(0xffF54748)),
-                  onPressed: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => CreateRoom()));
-                  },
-                  child: Text(
-                    "Create a class",
-                    style: TextStyle(fontSize: 16.0),
+            Hero(
+              tag: "createRoom",
+              child: Padding(
+                padding: const EdgeInsets.all(13.0),
+                child: Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: 50,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(primary: Color(0xffF54748)),
+                    onPressed: () {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => CreateRoom()));
+                    },
+                    child: Text(
+                      "Create a class",
+                      style: TextStyle(fontSize: 16.0),
+                    ),
                   ),
                 ),
               ),

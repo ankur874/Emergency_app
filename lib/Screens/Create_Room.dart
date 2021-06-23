@@ -13,6 +13,7 @@ class CreateRoom extends StatefulWidget {
 }
 
 class _CreateRoomState extends State<CreateRoom> {
+  bool isLoading = false;
   TextEditingController roomNameController = new TextEditingController();
   String currentUserId = FirebaseAuth.instance.currentUser!.uid;
   final SharedPrefs sharedPrefs = SharedPrefs();
@@ -31,52 +32,66 @@ class _CreateRoomState extends State<CreateRoom> {
           title: Text("Create Room"),
           backgroundColor: Color(0xff343F56),
         ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: MediaQuery.of(context).size.width / 2,
-                child: TextFormField(
-                  controller: roomNameController,
-                  decoration: InputDecoration(
-                    contentPadding: EdgeInsets.all(8.0),
-                    hintText: "Enter Room Name",
-                    hintStyle: TextStyle(fontSize: 16.0),
-                    enabledBorder: OutlineInputBorder(),
-                    focusedBorder: OutlineInputBorder(),
-                  ),
+        body: isLoading
+            ? Center(
+                child: CircularProgressIndicator(
+                  backgroundColor: Colors.black,
+                  strokeWidth: 6,
+                  color: Color(0xffF54748),
                 ),
-              ),
-              SizedBox(height: 20.0),
-              Container(
-                  width: MediaQuery.of(context).size.width / 3,
-                  height: 40.0,
-                  child: ElevatedButton(
-                      style:
-                          ElevatedButton.styleFrom(primary: Color(0xffF54748)),
-                      onPressed: () {
-                        var id = customAlphabet(
-                            roomNameController.text + "123456789", 10);
+              )
+            : Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: MediaQuery.of(context).size.width / 2,
+                      child: TextFormField(
+                        controller: roomNameController,
+                        decoration: InputDecoration(
+                          contentPadding: EdgeInsets.all(8.0),
+                          hintText: "Enter Room Name",
+                          hintStyle: TextStyle(fontSize: 16.0),
+                          enabledBorder: OutlineInputBorder(),
+                          focusedBorder: OutlineInputBorder(),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 20.0),
+                    Hero(
+                      tag: "createRoom",
+                      child: Container(
+                          width: MediaQuery.of(context).size.width / 3,
+                          height: 40.0,
+                          child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                  primary: Color(0xffF54748)),
+                              onPressed: () {
+                                var id = customAlphabet(
+                                    roomNameController.text + "123456789", 10);
 
-                        roomModel newRoom = new roomModel(
-                            rid: id.toString(),
-                            adminId: currentUserId,
-                            mates: [],
-                            roomName: roomNameController.text);
-                        uploadRoomToDb(newRoom);
-                        changeUserDetails(newRoom);
-                        sharedPrefs.saveUserRoom(true).whenComplete(() {
-                          Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => RoomScreen()));
-                          ;
-                        });
-                      },
-                      child: Text("Create Room"))),
-            ],
-          ),
-        ));
+                                roomModel newRoom = new roomModel(
+                                    rid: id.toString(),
+                                    adminId: currentUserId,
+                                    mates: [],
+                                    roomName: roomNameController.text);
+                                uploadRoomToDb(newRoom);
+                                changeUserDetails(newRoom);
+                                sharedPrefs.saveUserRoom(true).whenComplete(() {
+                                  setState(() {
+                                    isLoading = true;
+                                  });
+                                  Navigator.pushAndRemoveUntil(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => RoomScreen()),
+                                      (route) => false);
+                                });
+                              },
+                              child: Text("Create Room"))),
+                    ),
+                  ],
+                ),
+              ));
   }
 }
