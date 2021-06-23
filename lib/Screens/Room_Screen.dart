@@ -19,6 +19,20 @@ class RoomScreen extends StatefulWidget {
 
 class _RoomScreenState extends State<RoomScreen> {
   ///////////////////////////////////////////////////////////
+
+  ///////////////////////////////////////////////////////////
+  bool isLoading = false;
+  late String userEmail = "";
+  late String roomId;
+  late bool isAdmin;
+  String adminEmail = "";
+  String roomName = "";
+  List<dynamic> mates = [];
+  List<String> matesEmail = [];
+  List<String> tokenList = [];
+  late roomModel realRoom;
+  final SharedPrefs sharedPrefs = SharedPrefs();
+  ///////////////////////////////////////////
   Future<Response> sendNotification(
       List<String> tokenIdList, String contents, String heading) async {
     return await post(
@@ -47,18 +61,36 @@ class _RoomScreenState extends State<RoomScreen> {
     );
   }
 
-  ///////////////////////////////////////////////////////////
-  bool isLoading = false;
-  late String userEmail = "";
-  late String roomId;
-  late bool isAdmin;
-  String adminEmail = "";
-  String roomName = "";
-  List<dynamic> mates = [];
-  List<String> matesEmail = [];
-  List<String> tokenList = [];
-  late roomModel realRoom;
-  final SharedPrefs sharedPrefs = SharedPrefs();
+  ///////////////////////////////////////////
+  fillTokensList() async {
+    Stream<DocumentSnapshot<Map<String, dynamic>>> stream =
+        await FirebaseFirestore.instance
+            .collection("rooms")
+            .doc(roomId)
+            .snapshots();
+    stream.listen((event) {
+      roomModel room = roomModel.fromMap(event.data()!);
+      List<dynamic> adminId = room.mates;
+      String adminIdRoom = room.adminId;
+      for (int i = 0; i < adminId.length; i++) {
+        FirebaseFirestore.instance
+            .collection("users")
+            .doc(adminId[i])
+            .snapshots()
+            .listen((event1) {
+          tokenList.add(event1.data()!["tokenId"]);
+          FirebaseFirestore.instance
+              .collection("users")
+              .doc(adminIdRoom)
+              .snapshots()
+              .listen((event3) {
+            tokenList.add(event3.data()!["tokenId"]);
+          });
+        });
+      }
+    });
+  }
+
   getUserDetails() async {
     User joinedUser = await getCurrentUser();
     String joinedUserId = joinedUser.uid;
@@ -88,12 +120,10 @@ class _RoomScreenState extends State<RoomScreen> {
           .doc(mates[i])
           .get();
       matesEmail.add(data.data()!["email"]);
-      tokenList.add(data.data()!["tokenId"]);
     }
     DocumentSnapshot<Map<String, dynamic>> su =
         await FirebaseFirestore.instance.collection("users").doc(adminId).get();
     userClass user = userClass.fromMap(su.data()!);
-    tokenList.add(user.tokenId);
     this.setState(() {
       adminEmail = user.email;
       roomName = room.roomName;
@@ -156,6 +186,7 @@ class _RoomScreenState extends State<RoomScreen> {
   @override
   void initState() {
     super.initState();
+    fillTokensList();
     getUserDetails();
   }
 
@@ -230,10 +261,11 @@ class _RoomScreenState extends State<RoomScreen> {
                     GestureDetector(
                       onDoubleTap: () {
                         print("gg");
-                        // for (int i = 0; i < tokenList.length; i++) {
-                        sendNotification(tokenList, "It's emergency call",
-                            userEmail + " called an emergency meeting!");
-                        // }
+                        for (int i = 0; i < tokenList.length; i++) {
+                          print(tokenList[i]);
+                          // sendNotification(tokenList, "It's emergency call",
+                          //     userEmail + " called an emergency meeting!");
+                        }
                       },
                       child: Icon(
                         FontAwesomeIcons.phoneSquareAlt,
