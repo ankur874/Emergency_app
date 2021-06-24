@@ -21,6 +21,9 @@ class _JoiningScreenState extends State<JoiningScreen> {
   bool isLoading = false;
   Future<void> joinRoom() async {
     try {
+      setState(() {
+        isLoading = true;
+      });
       print("--------------------------------------------------");
       DocumentSnapshot<Map<String, dynamic>> vari = await FirebaseFirestore
           .instance
@@ -51,6 +54,9 @@ class _JoiningScreenState extends State<JoiningScreen> {
         });
       }
     } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
       print(e);
     }
   }
@@ -62,47 +68,59 @@ class _JoiningScreenState extends State<JoiningScreen> {
         title: Text("Join a class"),
         backgroundColor: Color(0xff343F56),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Form(
-              key: formKey,
-              child: Container(
-                  width: MediaQuery.of(context).size.width / 2,
-                  child: TextFormField(
-                    validator: (val) {
-                      return val!.length == 0
-                          ? "Room I'd can't be empty"
-                          : null;
-                    },
-                    controller: roomIdController,
-                    decoration: InputDecoration(
-                      contentPadding: EdgeInsets.all(8.0),
-                      hintText: "Enter Room I'd",
-                      hintStyle: TextStyle(fontSize: 16.0),
-                      enabledBorder: OutlineInputBorder(),
-                      focusedBorder: OutlineInputBorder(),
-                    ),
-                  )),
+      body: isLoading
+          ? Center(
+              child: CircularProgressIndicator(
+              strokeWidth: 6,
+              backgroundColor: Colors.black,
+              color: Color(0xffF54748),
+            ))
+          : Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Form(
+                    key: formKey,
+                    child: Container(
+                        width: MediaQuery.of(context).size.width / 2,
+                        child: TextFormField(
+                          validator: (val) {
+                            return val!.length == 0
+                                ? "Room I'd can't be empty"
+                                : null;
+                          },
+                          controller: roomIdController,
+                          decoration: InputDecoration(
+                            contentPadding: EdgeInsets.all(8.0),
+                            hintText: "Enter Room I'd",
+                            hintStyle: TextStyle(fontSize: 16.0),
+                            enabledBorder: OutlineInputBorder(),
+                            focusedBorder: OutlineInputBorder(),
+                          ),
+                        )),
+                  ),
+                  SizedBox(height: 20.0),
+                  Hero(
+                    tag: "joinRoom",
+                    child: Container(
+                        width: MediaQuery.of(context).size.width / 4,
+                        height: 40.0,
+                        child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                                primary: Color(0xffFB9300)),
+                            onPressed: () {
+                              if (formKey.currentState!.validate()) {
+                                setState(() {
+                                  isLoading = true;
+                                });
+                                joinRoom();
+                              }
+                            },
+                            child: Text("Join"))),
+                  ),
+                ],
+              ),
             ),
-            SizedBox(height: 20.0),
-            Hero(
-              tag: "joinRoom",
-              child: Container(
-                  width: MediaQuery.of(context).size.width / 4,
-                  height: 40.0,
-                  child: ElevatedButton(
-                      style:
-                          ElevatedButton.styleFrom(primary: Color(0xffFB9300)),
-                      onPressed: () {
-                        if (formKey.currentState!.validate()) joinRoom();
-                      },
-                      child: Text("Join"))),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

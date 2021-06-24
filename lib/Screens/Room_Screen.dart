@@ -217,6 +217,7 @@ class _RoomScreenState extends State<RoomScreen> {
 
   @override
   void dispose() {
+    detector.stopListening();
     super.dispose();
   }
 
@@ -348,6 +349,7 @@ class _RoomScreenState extends State<RoomScreen> {
                           isCopied = true;
                         });
                         Fluttertoast.showToast(msg: "Code copied!");
+
                         Clipboard.setData(ClipboardData(text: roomId));
                       },
                     ),
