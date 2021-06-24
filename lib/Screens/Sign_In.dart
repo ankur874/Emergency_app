@@ -54,10 +54,13 @@ class _SignInState extends State<SignIn> {
               backgroundColor: Colors.black,
               color: Color(0xffF54748),
             ))
-          : Container(
+          : SingleChildScrollView(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height / 5,
+                  ),
                   Hero(
                     tag: "logo",
                     child: Row(

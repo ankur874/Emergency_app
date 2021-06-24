@@ -18,6 +18,7 @@ class _SplashScreenState extends State<SplashScreen> {
   bool isLoading = true;
   @override
   void initState() {
+
     _sharedPrefs.getUserState().then((value) async {
       if (value != null) {
         _sharedPrefs.getUserRoom().then((event) {

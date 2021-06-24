@@ -9,8 +9,11 @@ import 'package:emergency_app/Screens/Home_Screen.dart';
 import 'package:emergency_app/Utils/Constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart';
+import 'package:shake/shake.dart';
+import 'package:flutter/services.dart';
 
 class RoomScreen extends StatefulWidget {
   @override
@@ -22,6 +25,7 @@ class _RoomScreenState extends State<RoomScreen> {
 
   ///////////////////////////////////////////////////////////
   bool isLoading = false;
+  late ShakeDetector detector;
   late String userEmail = "";
   late String roomId;
   late bool isAdmin;
@@ -30,6 +34,7 @@ class _RoomScreenState extends State<RoomScreen> {
   List<dynamic> mates = [];
   List<String> matesEmail = [];
   List<String> tokenList = [];
+  bool isCopied = false;
   late roomModel realRoom;
   final SharedPrefs sharedPrefs = SharedPrefs();
   ///////////////////////////////////////////
@@ -49,6 +54,8 @@ class _RoomScreenState extends State<RoomScreen> {
 
         // android_accent_color reprsent the color of the heading text in the notifiction
         "android_accent_color": "FF9976D2",
+
+        "sound": "notification.mp3",
 
         //  "small_icon": "ic_stat_onesignal_default",
 
@@ -141,6 +148,7 @@ class _RoomScreenState extends State<RoomScreen> {
           break;
         }
       }
+      print("NOT ADMINNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN");
       await FirebaseFirestore.instance
           .collection("rooms")
           .doc(roomId)
@@ -150,31 +158,31 @@ class _RoomScreenState extends State<RoomScreen> {
           .doc(joinedUserId)
           .update({"joinedRoom": "", "isAdmin": false});
     } else {
+      print("Adminmmmmmmmmmmmmmmmmmmmmm");
       await FirebaseFirestore.instance
           .collection("users")
           .doc(joinedUserId)
           .update({"joinedRoom": "", "isAdmin": false});
-      late String newAdmin;
-      var stram = FirebaseFirestore.instance
-          .collection("rooms")
-          .doc(roomId)
-          .snapshots();
-      List<dynamic> matess = [];
-      stram.listen((e) {
-        matess = e.data()!["mates"];
-      });
-      if (matess.length >= 1) {
+      String newAdmin;
+
+      print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+      print(mates.length);
+      print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+
+      if (mates.length >= 1) {
+        print("lastNot...........................");
         newAdmin = mates[0];
-        matess.removeAt(0);
+        mates.removeAt(0);
         await FirebaseFirestore.instance
             .collection("rooms")
             .doc(roomId)
-            .update({"adminId": newAdmin, "mates": matess});
+            .update({"adminId": newAdmin, "mates": mates});
         await FirebaseFirestore.instance
             .collection("users")
             .doc(newAdmin)
             .update({"isAdmin": true});
       } else {
+        print("lasttttttttttttttttttttttttt");
         await FirebaseFirestore.instance
             .collection("rooms")
             .doc(roomId)
@@ -193,6 +201,23 @@ class _RoomScreenState extends State<RoomScreen> {
   void initState() {
     super.initState();
     getUserDetails();
+    ShakeDetector detector = ShakeDetector.waitForStart(
+        shakeThresholdGravity: 10,
+        onPhoneShake: () {
+          print("hellooooooooooo");
+          Fluttertoast.showToast(msg: "Sending notification!");
+          print(tokenList.length);
+          sendNotification(tokenList, "It's an emergency call",
+              userEmail + " called an emergency meeting!");
+          Fluttertoast.showToast(msg: "Notification sent!");
+        });
+
+    detector.startListening();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
@@ -265,13 +290,10 @@ class _RoomScreenState extends State<RoomScreen> {
                   children: [
                     GestureDetector(
                       onTap: () {
-                        //print("gg");
-                        // print(tokenList.length);
-                        for (int i = 0; i < tokenList.length; i++) {
-                          // print(tokenList[i]);
-                          sendNotification(tokenList, "It's emergency call",
-                              userEmail + " called an emergency meeting!");
-                        }
+                        Fluttertoast.showToast(msg: "Sending notification!");
+                        sendNotification(tokenList, "It's an emergency call",
+                            userEmail + " called an emergency meeting!");
+                        Fluttertoast.showToast(msg: "Notification sent!");
                       },
                       child: Icon(
                         FontAwesomeIcons.phoneSquareAlt,
@@ -313,6 +335,22 @@ class _RoomScreenState extends State<RoomScreen> {
                         },
                         child: Text("Leave Room")),
                     Text(userEmail),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    GestureDetector(
+                      child: Icon(
+                        Icons.copy,
+                        color: !isCopied ? Colors.grey : Colors.green,
+                      ),
+                      onTap: () {
+                        setState(() {
+                          isCopied = true;
+                        });
+                        Fluttertoast.showToast(msg: "Code copied!");
+                        Clipboard.setData(ClipboardData(text: roomId));
+                      },
+                    ),
                   ],
                 ),
               ),

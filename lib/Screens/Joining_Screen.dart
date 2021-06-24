@@ -18,6 +18,7 @@ class _JoiningScreenState extends State<JoiningScreen> {
   TextEditingController roomIdController = new TextEditingController();
   final formKey = GlobalKey<FormState>();
   final SharedPrefs _sharedPrefs = SharedPrefs();
+  bool isLoading = false;
   Future<void> joinRoom() async {
     try {
       print("--------------------------------------------------");
@@ -26,28 +27,28 @@ class _JoiningScreenState extends State<JoiningScreen> {
           .collection("rooms")
           .doc(roomIdController.text.toString())
           .get();
-      roomModel room = roomModel.fromMap(vari.data()!);
-      List<dynamic> newMates = vari["mates"];
-
-      print("-----------------------------6464----------");
-      User currentUser = await getCurrentUser();
-      newMates.add(currentUser.uid);
-      FirebaseFirestore.instance
-          .collection("rooms")
-          .doc(roomIdController.text)
-          .update({"mates": newMates});
-      FirebaseFirestore.instance
-          .collection("users")
-          .doc(currentUser.uid)
-          .update({"joinedRoom": room.rid}).then((value) {
-        _sharedPrefs.saveUserRoom(true).whenComplete(() {
-          Navigator.pushReplacement(
-              context, MaterialPageRoute(builder: (context) => RoomScreen()));
-        });
-      });
-    } on FirebaseAuthException catch (e) {
-      if (e.code == "user-not-found") {
+      if (vari == null) {
         Fluttertoast.showToast(msg: "No room exist!");
+      } else {
+        roomModel room = roomModel.fromMap(vari.data()!);
+        List<dynamic> newMates = vari["mates"];
+
+        print("-----------------------------6464----------");
+        User currentUser = await getCurrentUser();
+        newMates.add(currentUser.uid);
+        FirebaseFirestore.instance
+            .collection("rooms")
+            .doc(roomIdController.text)
+            .update({"mates": newMates});
+        FirebaseFirestore.instance
+            .collection("users")
+            .doc(currentUser.uid)
+            .update({"joinedRoom": room.rid}).then((value) {
+          _sharedPrefs.saveUserRoom(true).whenComplete(() {
+            Navigator.pushReplacement(
+                context, MaterialPageRoute(builder: (context) => RoomScreen()));
+          });
+        });
       }
     } catch (e) {
       print(e);
